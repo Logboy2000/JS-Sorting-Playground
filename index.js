@@ -74,17 +74,6 @@ gui.add(config, "REVERSE_ORDER").name("Reversed")
 gui.add(config, 'ARRAY_LENGTH', 3, 25000, 1).name("# Of Elements")
 
 
-gui.add({
-    fun: generateArrButtonPressed
-}, 'fun').name('Generate Array');
-
-function generateArrButtonPressed() {
-    arr = makeRandomArray(config.ARRAY_LENGTH)
-    activeIndices = []
-    config.PAUSED = true;
-    playbackBtn.name("Play")
-    sortInstance = sortAlgos[config.SELECTED_ALGORITHM](arr)
-}
 
 
 
@@ -104,22 +93,7 @@ gui.add(config, 'SELECTED_ALGORITHM', algoMap).name('Algorithm').onFinishChange(
 });
 gui.add(config, 'SPEED_MULT', 1, 100, 1).name("Speed Mult").listen()
 
-const playbackBtn = gui.add({
-    fun: playbackBtnPressed
-}, 'fun').name('Start');
 
-function playbackBtnPressed() {
-    if (config.PAUSED) {
-        config.PAUSED = false;
-        playbackBtn.name("Pause")
-        if (!sortInstance) {
-            sortInstance = sortAlgos[config.SELECTED_ALGORITHM](arr);
-        }
-    } else {
-        config.PAUSED = true;
-        playbackBtn.name("Play")
-    }
-}
 
 
 
@@ -155,7 +129,33 @@ gui.add({
 gui.add({
     fun: saveSettings
 }, 'fun').name('Clear Saved Settings');
+gui.add({
+    fun: generateArrButtonPressed
+}, 'fun').name('Generate Array');
 
+function generateArrButtonPressed() {
+    arr = makeRandomArray(config.ARRAY_LENGTH)
+    activeIndices = []
+    config.PAUSED = true;
+    playbackBtn.name("Play")
+    sortInstance = sortAlgos[config.SELECTED_ALGORITHM](arr)
+}
+const playbackBtn = gui.add({
+    fun: playbackBtnPressed
+}, 'fun').name('Start');
+
+function playbackBtnPressed() {
+    if (config.PAUSED) {
+        config.PAUSED = false;
+        playbackBtn.name("Pause")
+        if (!sortInstance) {
+            sortInstance = sortAlgos[config.SELECTED_ALGORITHM](arr);
+        }
+    } else {
+        config.PAUSED = true;
+        playbackBtn.name("Play")
+    }
+}
 
 
 
