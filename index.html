@@ -1,0 +1,72 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorting Playground</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: black;
+
+        }
+        canvas {
+            width: 100vw;
+            height: 100vh;
+            display: block;
+            
+        }
+        select {
+            background-color: black;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas"></canvas>
+    <script type="text/javascript" src="dat.gui.min.js"></script>
+    <script type="text/javascript" src="sorts.js"></script>
+    <script type="module">
+        
+        import {draw, update, start} from "./index.js";
+        document.addEventListener("DOMContentLoaded", loaded)
+        let canvas, ctx
+        let prevTime = performance.now()
+        
+        function loaded() {
+            
+            canvas = document.getElementById("canvas")
+            ctx = canvas.getContext("2d")
+            ctx.imageSmoothingEnabled = false;
+
+            // older browser support
+            ctx.mozImageSmoothingEnabled = false;
+            ctx.webkitImageSmoothingEnabled = false;
+            ctx.msImageSmoothingEnabled = false;
+            window.addEventListener('resize', resizeCanvas)
+            resizeCanvas()
+            start()
+            loop()
+        }
+
+        function loop() {
+            update(performance.now() - prevTime)
+            draw(canvas, ctx)
+            prevTime = performance.now()
+            requestAnimationFrame(loop)
+        }
+
+
+        function resizeCanvas() {
+            const canvas = document.getElementById('canvas')
+            canvas.width = canvas.clientWidth
+            canvas.height = canvas.clientHeight
+        }
+    </script>
+    
+    
+</body>
+
+</html>
