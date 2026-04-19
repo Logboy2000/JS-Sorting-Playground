@@ -8,7 +8,7 @@ function* bubbleSort(array) {
                 [array[i], array[i + 1]] = [array[i + 1], array[i]];
             }
             // Yield the indices we are currently looking at
-            yield { highlighting: [i, i + 1] };
+            yield { highlighting: [i] };
         }
     }
 }
@@ -253,4 +253,164 @@ function* bogoSort(array) {
         }
         yield { highlighting: Array.from({ length: array.length }, (_, i) => i) };
     }
+}
+
+//////
+function* mergeSort(array, start = 0, end = array.length - 1) {
+    if (start < end) {
+        let mid = Math.floor((start + end) / 2);
+        yield* mergeSort(array, start, mid);
+        yield* mergeSort(array, mid + 1, end);
+        yield* merge(array, start, mid, end);
+    }
+}
+
+function* merge(array, start, mid, end) {
+    let left = array.slice(start, mid + 1);
+    let right = array.slice(mid + 1, end + 1);
+    let i = 0, j = 0, k = start;
+
+    while (i < left.length && j < right.length) {
+        if (left[i] <= right[j]) {
+            array[k] = left[i];
+            i++;
+        } else {
+            array[k] = right[j];
+            j++;
+        }
+        yield { highlighting: [k] };
+        k++;
+    }
+
+    while (i < left.length) {
+        array[k] = left[i];
+        i++;
+        yield { highlighting: [k] };
+        k++;
+    }
+
+    while (j < right.length) {
+        array[k] = right[j];
+        j++;
+        yield { highlighting: [k] };
+        k++;
+    }
+}
+
+
+
+function* sleepSort(array) {
+    let sorted = [];
+    let original = [...array];
+    let max = Math.max(...array);
+    
+    // We simulate the "time" steps
+    for (let time = 0; time <= max; time++) {
+        for (let i = 0; i < original.length; i++) {
+            if (original[i] === time) {
+                sorted.push(original[i]);
+                // Highlight the element "waking up"
+                yield { highlighting: [i] };
+            }
+        }
+    }
+    
+    // Map sorted values back to original array for display
+    for (let i = 0; i < array.length; i++) {
+        array[i] = sorted[i];
+        yield { highlighting: [i] };
+    }
+}
+
+
+
+function* radixSort(array) {
+    const max = Math.max(...array);
+    // Determine number of digits in the max number
+    for (let exp = 1; Math.floor(max / exp) > 0; exp *= 10) {
+        yield* countingSortForRadix(array, exp);
+    }
+}
+
+function* countingSortForRadix(array, exp) {
+    let output = new Array(array.length);
+    let count = new Array(10).fill(0);
+
+    for (let i = 0; i < array.length; i++) {
+        let digit = Math.floor(array[i] / exp) % 10;
+        count[digit]++;
+        yield { highlighting: [i] };
+    }
+
+    for (let i = 1; i < 10; i++) {
+        count[i] += count[i - 1];
+    }
+
+    for (let i = array.length - 1; i >= 0; i--) {
+        let digit = Math.floor(array[i] / exp) % 10;
+        output[count[digit] - 1] = array[i];
+        count[digit]--;
+    }
+
+    for (let i = 0; i < array.length; i++) {
+        array[i] = output[i];
+        yield { highlighting: [i] };
+    }
+}
+// !!!Broken!!! I dont know why yet 😭
+// function* bitonicSort(array) {
+//     let n = array.length;
+//     for (let k = 2; k <= n; k *= 2) {
+//         for (let j = k / 2; j > 0; j /= 2) {
+//             for (let i = 0; i < n; i++) {
+//                 let l = i ^ j;
+//                 if (l > i) {
+//                     if (((i & k) === 0 && array[i] > array[l]) || 
+//                         ((i & k) !== 0 && array[i] < array[l])) {
+//                         [array[i], array[l]] = [array[l], array[i]];
+//                     }
+//                     yield { highlighting: [i, l] };
+//                 }
+//             }
+//         }
+//     }
+// }
+
+function* circleSort(array) {
+    let changed = true;
+    while (changed) {
+        changed = (yield* circleSortRecursive(array, 0, array.length - 1)) > 0;
+    }
+}
+
+function* circleSortRecursive(array, low, high) {
+    let swaps = 0;
+    if (low === high) return 0;
+
+    let l = low;
+    let h = high;
+
+    while (l < h) {
+        if (array[l] > array[h]) {
+            [array[l], array[h]] = [array[h], array[l]];
+            swaps++;
+        }
+        yield { highlighting: [l, h] };
+        l++;
+        h--;
+    }
+
+    if (l === h) {
+        if (array[l] > array[l + 1]) {
+            [array[l], array[l + 1]] = [array[l + 1], array[l]];
+            swaps++;
+        }
+        yield { highlighting: [l, l + 1] };
+    }
+
+    let mid = Math.floor((high - low) / 2);
+    swaps += yield* circleSortRecursive(array, low, low + mid);
+    swaps += yield* circleSortRecursive(array, low + mid + 1, high);
+
+    return swaps;
 }
