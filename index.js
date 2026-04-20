@@ -163,6 +163,7 @@ function loadSettings() {
 
 function clearSettings() {
 	localStorage.clear()
+	alert("Saved settings cleared!")
 }
 loadSettings() // from cookies if saved
 const gui = new dat.GUI({ name: "Settings" })
@@ -320,7 +321,9 @@ const keybindsButton = gui
 	.add(
 		{
 			fun: () => {
-				if (document.getElementById("keybinds-popup").style.display === "block") {
+				if (
+					document.getElementById("keybinds-popup").style.display === "block"
+				) {
 					document.getElementById("keybinds-popup").style.display = "none"
 				} else {
 					document.getElementById("keybinds-popup").style.display = "block"
@@ -377,7 +380,10 @@ function start() {
 			clearSettings()
 			location.reload()
 		}
-		
+		// step through sort with enter key (only works when paused and not in final check)
+		if (e.key === "Enter") {
+			step()
+		}
 	})
 }
 
@@ -394,54 +400,61 @@ function beginSort(selectedAlgorithm = config.SELECTED_ALGORITHM) {
 	displayBars = arr.map((val, i) => ({ value: val, x: i, targetX: i }))
 }
 
+function update() {
+	if (sortInstance && !config.PAUSED) {
+		step()
+	}
+}
+
 /**
  * Processes a single step of the current sort
  */
-function update() {
-	if (sortInstance && !config.PAUSED) {
-		const result = sortInstance.next()
+function step() {
+	if (!sortInstance) {
+		beginSort()
+	}
+	const result = sortInstance.next()
 
-		if (!result.done) {
-			// result.value contains the { highlighting: [...] } object yielded in each sorting step
-			activeIndices = result.value.highlighting
-			if (activeIndices.length > 0) {
-				const val = arr[activeIndices[0]]
-				playNote(val)
-			}
-			if (!doFinalCheck) {
-				stats.STEPS++
-			}
-		} else {
-			if (doFinalCheck === false) {
-				doFinalCheck = true
-				sortInstance = finalCheck(arr)
-			} else {
-				if (config.AUTO_NEXT_ALGO) {
-					config.PAUSED = true
-					playbackBtn.name("Waiting...")
-					setTimeout(() => {
-						if (config.SELECTED_ALGORITHM < sortAlgos.length - 1) {
-							config.SELECTED_ALGORITHM++
-							arr = makeRandomArray(config.ARRAY_LENGTH)
-							beginSort(config.SELECTED_ALGORITHM)
-							config.PAUSED = false
-							playbackBtn.name("Pause")
-						} else {
-							playbackBtn.name("Start")
-							sortInstance = null
-						}
-					}, 500)
-				} else {
-					config.PAUSED = true
-					playbackBtn.name("Start")
-					sortInstance = null
-				}
-			}
-
-			activeIndices = [] // Clear highlights when done
+	if (!result.done) {
+		activeIndices = result.value.highlighting
+		if (activeIndices.length > 0) {
+			const val = arr[activeIndices[0]]
+			playNote(val)
 		}
+		if (!doFinalCheck) {
+			stats.STEPS++
+		}
+	} else {
+		if (doFinalCheck === false) {
+			doFinalCheck = true
+			sortInstance = finalCheck(arr)
+		} else {
+			if (config.AUTO_NEXT_ALGO) {
+				config.PAUSED = true
+				playbackBtn.name("Waiting...")
+				setTimeout(() => {
+					if (config.SELECTED_ALGORITHM < sortAlgos.length - 1) {
+						config.SELECTED_ALGORITHM++
+						arr = makeRandomArray(config.ARRAY_LENGTH)
+						beginSort(config.SELECTED_ALGORITHM)
+						config.PAUSED = false
+						playbackBtn.name("Pause")
+					} else {
+						playbackBtn.name("Start")
+						sortInstance = null
+					}
+				}, 500)
+			} else {
+				config.PAUSED = true
+				playbackBtn.name("Start")
+				sortInstance = null
+			}
+		}
+
+		activeIndices = [] // Clear highlights when done
 	}
 }
+
 function makeRandomArray(length = 10) {
 	let nums = []
 
