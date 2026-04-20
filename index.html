@@ -21,50 +21,59 @@
             background-color: black;
             color: white;
         }
+        .popup {
+            position: fixed;
+            position-anchor: auto;
+            width: fit-content;
+            height: fit-content;
+            color: white;
+            background-color: #000000e7;
+            inset: 0px;
+            margin: auto;
+            border-width: initial;
+            border-style: solid;
+            border-color: initial;
+            border-image: initial;
+            padding: 0.25em;
+            overflow: auto;
+            font: 11px 'Lucida Grande', sans-serif;
+            transform: scale(2);
+            filter: drop-shadow(0px 0px 5px black);
+        }
+        .popup h1 {
+            text-align: center;
+        }
+        .popup button {
+            display: block;
+            margin: 0.5em auto;
+            padding: 0.25em 1em;
+            background-color: white;
+            color: black;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
     </style>
 </head>
 
 <body>
+    <div id="keybinds-popup" class="popup" style="display: none;">
+        <h1>Keybinds</h1>
+        <p>Space: Play/Pause</p>
+        <p>+/-: Increase/Decrease Step Delay</p>
+        <p>Arrow Right: Next Algorithm</p>
+        <p>Arrow Left: Previous Algorithm</p>
+
+        <p>H: Hide Menu</p>
+        <p>G: Generate Array</p>
+        <p>S: Save Settings</p>
+        <p>C: Clear Settings</p>
+        <button onclick="document.getElementById('keybinds-popup').style.display = 'none'">Okie Dokie 👍👍👍</button>
+    </div>
     <canvas id="canvas"></canvas>
     <script type="text/javascript" src="dat.gui.min.js"></script>
     <script type="text/javascript" src="sorts.js"></script>
-    <script type="module">
-        
-        import {draw, update, start} from "./index.js";
-        document.addEventListener("DOMContentLoaded", loaded)
-        let canvas, ctx
-        let prevTime = performance.now()
-        
-        function loaded() {
-            
-            canvas = document.getElementById("canvas")
-            ctx = canvas.getContext("2d")
-            ctx.imageSmoothingEnabled = false;
-
-            // older browser support
-            ctx.mozImageSmoothingEnabled = false;
-            ctx.webkitImageSmoothingEnabled = false;
-            ctx.msImageSmoothingEnabled = false;
-            window.addEventListener('resize', resizeCanvas)
-            resizeCanvas()
-            start()
-            loop()
-        }
-
-        function loop() {
-            update(performance.now() - prevTime)
-            draw(canvas, ctx)
-            prevTime = performance.now()
-            requestAnimationFrame(loop)
-        }
-
-
-        function resizeCanvas() {
-            const canvas = document.getElementById('canvas')
-            canvas.width = canvas.clientWidth
-            canvas.height = canvas.clientHeight
-        }
-    </script>
+    <script src="index.js"></script>
     
     
 </body>

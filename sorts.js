@@ -8,7 +8,7 @@ function* bubbleSort(array) {
                 [array[i], array[i + 1]] = [array[i + 1], array[i]];
             }
             // Yield the indices we are currently looking at
-            yield { highlighting: [i] };
+            yield { highlighting: [i, i + 1] };
         }
     }
 }
