@@ -125,8 +125,10 @@ let config = {
 
 	/// visual
 	SPACING: 0,
-	BG_COLOR: "#000000",
+	ZOOM: 1,
+	
 	// color
+	BG_COLOR: "#000000",
 	PRIMARY_COLOR: "#FFFFFF",
 	ACTIVE_COLOR: "#FF0000",
 	SORTED_COLOR: "#00FF00",
@@ -203,7 +205,7 @@ gui
 		beginSort(Number(val))
 	})
 	.listen()
-gui.add(config, "STEP_DELAY", 0, 1000, 1).name("Step Delay (ms)").listen()
+gui.add(config, "STEP_DELAY", 0, 1000, 0.0001).name("Step Delay (ms)").listen()
 gui.add(config, "AUTO_NEXT_ALGO").name("Auto Next Algo")
 gui.add(config, "SMOOTH_ANIMATION").name("Smooth Animation")
 gui.add(config, "ANIMATION_SPEED", 0.01, 1).name("Animation Speed")
@@ -224,15 +226,11 @@ gui
 		}
 	})
 gui.add(config, "SPACING", 0, 10).step(1).name("Bar Spacing")
+gui.add(config, "ZOOM", 0.1, 1, 0.001).name("Zoom")
 
-gui
-	.add(
-		{
-			fun: generateArrButtonPressed,
-		},
-		"fun",
-	)
-	.name("Generate Array")
+
+gui.add({fun: useCustomArrayButtonPressed},"fun",).name("Use Custom Array")
+gui.add({fun: generateArrButtonPressed},"fun",).name("Generate Array")
 
 function generateArrButtonPressed() {
 	arr = makeRandomArray(config.ARRAY_LENGTH)
@@ -240,6 +238,25 @@ function generateArrButtonPressed() {
 	beginSort()
 	playbackBtn.name("Play")
 }
+function useCustomArrayButtonPressed() {
+	const input = prompt("Enter a comma-separated list of numbers (e.g. 5,3,8,1):")
+	if (input) {
+		const parsed = input
+			.split(",")
+			.map((s) => parseFloat(s.trim()))
+			.filter((n) => !isNaN(n))
+		if (parsed.length > 0) {
+			arr = parsed
+			highestNum = Math.max(...arr)
+			config.PAUSED = true
+			beginSort()
+			playbackBtn.name("Play")
+		} else {
+			alert("No valid numbers found in input.")
+		}
+	}
+}
+
 const playbackBtn = gui
 	.add(
 		{
@@ -350,12 +367,12 @@ function start() {
 	document.addEventListener("keydown", (e) => {
 		if (e.key === "=" || e.key === "+") {
 			if (config.STEP_DELAY < 1000) {
-				config.STEP_DELAY += 5
+				config.STEP_DELAY += 0.001
 			}
 		}
 		if (e.key === "-") {
-			if (config.STEP_DELAY >= 5) {
-				config.STEP_DELAY -= 5
+			if (config.STEP_DELAY >= 1) {
+				config.STEP_DELAY -= 0.001
 			} else {
 				config.STEP_DELAY = 0
 			}
@@ -567,6 +584,14 @@ function draw(canvas, ctx) {
 		)
 	}
 
+	ctx.save()
+	ctx.scale(config.ZOOM, config.ZOOM)
+	ctx.translate(
+		(canvas.width / config.ZOOM - canvas.width) / 2,
+		(canvas.height / config.ZOOM - canvas.height) / 2,
+	)
+
+
 	if (config.SMOOTH_ANIMATION && displayBars.length === totalBars) {
 		// 1. Map current array values to their indices
 		const targetIndices = new Map()
@@ -617,6 +642,7 @@ function draw(canvas, ctx) {
 			ctx.fillRect(x, canvas.height - barHeight, drawWidth, barHeight)
 		}
 	}
+	ctx.restore()
 }
 function randIntRange(min, max) {
 	const minCeiled = Math.ceil(min)
