@@ -357,24 +357,6 @@ function* countingSortForRadix(array, exp) {
         yield { highlighting: [i] };
     }
 }
-// !!!Broken!!! I dont know why yet 😭
-// function* bitonicSort(array) {
-//     let n = array.length;
-//     for (let k = 2; k <= n; k *= 2) {
-//         for (let j = k / 2; j > 0; j /= 2) {
-//             for (let i = 0; i < n; i++) {
-//                 let l = i ^ j;
-//                 if (l > i) {
-//                     if (((i & k) === 0 && array[i] > array[l]) || 
-//                         ((i & k) !== 0 && array[i] < array[l])) {
-//                         [array[i], array[l]] = [array[l], array[i]];
-//                     }
-//                     yield { highlighting: [i, l] };
-//                 }
-//             }
-//         }
-//     }
-// }
 
 function* circleSort(array) {
     let changed = true;
@@ -430,3 +412,4 @@ function* stalinSort(array) {
 	}
 	
 }
+
