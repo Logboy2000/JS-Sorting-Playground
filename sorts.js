@@ -414,3 +414,19 @@ function* circleSortRecursive(array, low, high) {
 
     return swaps;
 }
+
+function* stalinSort(array) {
+	if (array.length === 0) return;
+	let max = array[0];
+	let i = 1;
+	while (i < array.length) {
+		yield { highlighting: [i - 1, i] };
+		if (array[i] < max) {
+			array.splice(i, 1);
+		} else {
+			max = array[i];
+			i++;
+		}
+	}
+	
+}

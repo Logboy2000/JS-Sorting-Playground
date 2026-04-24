@@ -78,6 +78,7 @@ const sortAlgos = [
 	circleSort,
 	stoogeSort,
 	bogoSort,
+	stalinSort
 ]
 const algoNames = [
 	"Bubble Sort",
@@ -98,6 +99,7 @@ const algoNames = [
 	"Circle Sort",
 	"Stooge Sort",
 	"Bogo Sort",
+	"Stalin Sort"
 ]
 
 let arr = []
